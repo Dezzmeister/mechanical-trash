@@ -6,7 +6,8 @@ import java.util.List;
 
 /**
  * Represents a defined mathematical function with one input and one output. Unknown constants and other unknown functions
- * must be added 
+ * must be added via {@link Function#assumeConstants(String...) assumeConstants()} and 
+ * {@link Function#assumeFunctions(FunctionPrototype...) assumeFunctions()}, then {@link Function#prepare() prepare()} must be called.
  *
  * @author Joe Desmond
  */
@@ -52,7 +53,7 @@ public class Function implements FunctionPrototype {
 	/**
 	 * The function definition.
 	 */
-	public final String expr;
+	private String expr;
 	
 	/**
 	 * Creates a function. If the function is not defined with an '=', then <code>_expr</code> is assumed
@@ -65,7 +66,7 @@ public class Function implements FunctionPrototype {
 	public Function(String _input, String _output, String _expr) {
 		input = _input;
 		output = _output;
-		expr = addImplicitOperators(_expr);
+		expr = _expr;
 	}
 	
 	/**
@@ -77,6 +78,18 @@ public class Function implements FunctionPrototype {
 	 */
 	public Function(FunctionPrototype proto, String _expr) {
 		this(proto.input(), proto.output(), _expr);
+	}
+	
+	/**
+	 * Call this after this function and all unknowns have been set via {@link Function#assumeConstants(String...) assumeConstants()}
+	 * and {@link Function#assumeFunctions(FunctionPrototype...) assumeFunctions()}.
+	 * 
+	 * @return this Function
+	 */
+	public Function prepare() {
+		expr = addImplicitOperators(expr);
+		
+		return this;
 	}
 	
 	/**
@@ -168,5 +181,14 @@ public class Function implements FunctionPrototype {
 	@Override
 	public String output() {
 		return output;
+	}
+	
+	/**
+	 * Returns the definition of this function.
+	 * 
+	 * @return function definition
+	 */
+	public String definition() {
+		return expr;
 	}
 }
