@@ -12,22 +12,5 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="libs/apfloat-1.8.3.jar"/>
-	<classpathentry kind="lib" path="libs/commons-csv-1.4.jar"/>
-	<classpathentry kind="lib" path="libs/guava-20.0.jar"/>
-	<classpathentry kind="lib" path="libs/hipparchus-core-1.1.jar"/>
-	<classpathentry kind="lib" path="libs/hipparchus-fft-1.1.jar"/>
-	<classpathentry kind="lib" path="libs/hipparchus-fitting-1.1.jar"/>
-	<classpathentry kind="lib" path="libs/hipparchus-ode-1.1.jar"/>
-	<classpathentry kind="lib" path="libs/hipparchus-optim-1.1.jar"/>
-	<classpathentry kind="lib" path="libs/hipparchus-stat-1.1.jar"/>
-	<classpathentry kind="lib" path="libs/jas-2.6.5765.jar"/>
-	<classpathentry kind="lib" path="libs/jsr305.jar"/>
-	<classpathentry kind="lib" path="libs/junit-4.6.jar"/>
-	<classpathentry kind="lib" path="libs/Lab4Math-2.0.5.jar"/>
-	<classpathentry kind="lib" path="libs/log4j-1.2.17.jar"/>
-	<classpathentry kind="lib" path="libs/log4j-over-slf4j-1.7.2.jar"/>
-	<classpathentry kind="lib" path="libs/matheclipse-core-1.0.0-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="libs/txtmark-0.13.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
