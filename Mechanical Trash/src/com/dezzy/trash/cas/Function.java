@@ -121,12 +121,19 @@ public class Function implements FunctionPrototype {
 		String out = in;
 		
 		for (String fnName : PREDEFINED_FUNCTIONS) {
-			String pattern = "("+fnName+")([0-9,.]+|("+input+"|"+output+"))";
-			Pattern r = Pattern.compile(pattern);
-			Matcher m = r.matcher(out);
+			String regex = "("+fnName+")(([\\d.]+)|("+input+"|"+output+"))";
+			Pattern pattern = Pattern.compile(regex);
+			Matcher matcher = pattern.matcher(out);
 			
-			while (m.find()) {
-				System.out.println(out.substring(m.start(),m.end()));
+			int count = 0;
+			while (matcher.find()) {
+				String sub = out.substring(matcher.start() + count,matcher.end() + count);
+				
+				String replacement = sub.substring(0,fnName.length()) + "(" + sub.substring(fnName.length()) + ")";
+				out = out.replace(sub, replacement);
+				
+				//Because of added parentheses, offset by two for next match of same function name
+				count += 2;
 			}
 		}
 		
@@ -134,7 +141,32 @@ public class Function implements FunctionPrototype {
 	}
 	
 	private String addImplicitMultipliers(String in) {
-		return in.replaceAll("[)][(]", ")*(");
+		String out = in.replaceAll("[)][(]", ")*(");
+		
+		for (String fnName : PREDEFINED_FUNCTIONS) {
+			//Crazy regex magic
+			String regex = "(([\\d.]+)("+input+"|"+fnName+"|"+output+"|([(]([\\d.\\-\\+\\*\\/\\^]|"+input+"|"+output+"|"+fnName+")+[)])))";
+			Pattern pattern = Pattern.compile(regex);
+			Matcher matcher = pattern.matcher(out);
+			
+			Pattern subPattern = Pattern.compile("("+input+"|"+output+"|[(])");
+			
+			int count = 0;
+			while (matcher.find()) {
+				String sub = out.substring(matcher.start() + count, matcher.end() + count);
+				System.out.println(sub);
+				Matcher subMatcher = subPattern.matcher(sub);
+				
+				if (subMatcher.find()) {
+					int index = subMatcher.start();
+					String replacement = "(" + sub.substring(0,index) + "*" + sub.substring(index) + ")";
+					out = out.replace(sub, replacement);
+					count += 3;
+				}
+			}
+		}
+		
+		return out;
 	}
 	
 	private String removeWhiteSpace(String in) {
