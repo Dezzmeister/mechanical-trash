@@ -3,6 +3,8 @@ package com.dezzy.trash.cas;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Represents a defined mathematical function with one input and one output. Unknown constants and other unknown functions
@@ -111,13 +113,32 @@ public class Function implements FunctionPrototype {
 	public String addImplicitOperators(String in) {
 		String out = in;
 		
+		out = addImplicitMultipliers(addFunctionParentheses(removeWhiteSpace(in)));
 		return out;
 	}
 	
 	private String addFunctionParentheses(String in) {
 		String out = in;
 		
-		return null;
+		for (String fnName : PREDEFINED_FUNCTIONS) {
+			String pattern = "("+fnName+")([0-9,.]+|("+input+"|"+output+"))";
+			Pattern r = Pattern.compile(pattern);
+			Matcher m = r.matcher(out);
+			
+			while (m.find()) {
+				System.out.println(out.substring(m.start(),m.end()));
+			}
+		}
+		
+		return out;
+	}
+	
+	private String addImplicitMultipliers(String in) {
+		return in.replaceAll("[)][(]", ")*(");
+	}
+	
+	private String removeWhiteSpace(String in) {
+		return in.replaceAll(" ", "");
 	}
 	
 	/**
