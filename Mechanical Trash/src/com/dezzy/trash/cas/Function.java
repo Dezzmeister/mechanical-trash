@@ -49,6 +49,12 @@ public class Function implements FunctionPrototype {
 	private final List<String> constants = new ArrayList<String>();
 	private final List<FunctionPrototype> functions = new ArrayList<FunctionPrototype>();
 	
+	private List<String> fullConstantsList = new ArrayList<String>();
+	private List<String> fullFunctionsList = new ArrayList<String>();
+	
+	private String constantsRegex;
+	private String functionsRegex;
+	
 	private final String input;
 	private final String output;
 	
@@ -89,9 +95,40 @@ public class Function implements FunctionPrototype {
 	 * @return this Function
 	 */
 	public Function prepare() {
+		constantsRegex = generateConstantsRegex();
+		functionsRegex = generateFunctionsRegex();
+		
 		expr = addImplicitOperators(expr);
 		
 		return this;
+	}
+	
+	private String generateConstantsRegex() {
+		String out = "(";
+		
+		PREDEFINED_CONSTANTS.forEach(fullConstantsList::add);
+		constants.forEach(fullConstantsList::add);
+		
+		for (String constant : fullConstantsList) {
+			out += "("+constant+")|";
+		}
+		
+		//Remove trailing pipe and replace with close parenthesis
+		return out.substring(0,out.length()-1) + ")";
+	}
+	
+	private String generateFunctionsRegex() {
+		String out = "(";
+		
+		PREDEFINED_FUNCTIONS.forEach(fullFunctionsList::add);
+		functions.forEach(p -> fullFunctionsList.add(p.output()));
+		
+		for (String function : fullFunctionsList) {
+			out += "("+function+")|";
+		}
+		
+		//Remove trailing pipe and replace with close parenthesis
+		return out.substring(0,out.length()-1) + ")";
 	}
 	
 	/**
@@ -121,7 +158,7 @@ public class Function implements FunctionPrototype {
 		String out = in;
 		
 		for (String fnName : PREDEFINED_FUNCTIONS) {
-			String regex = "("+fnName+")(([\\d.]+)|("+input+"|"+output+"))";
+			String regex = "("+fnName+")(([\\d.]+)|("+input+"|"+output+"|"+constantsRegex+"))";
 			Pattern pattern = Pattern.compile(regex);
 			Matcher matcher = pattern.matcher(out);
 			
@@ -145,20 +182,26 @@ public class Function implements FunctionPrototype {
 		
 		for (String fnName : PREDEFINED_FUNCTIONS) {
 			//Crazy regex magic
-			String regex = "(([\\d.]+)("+input+"|"+fnName+"|"+output+"|([(]([\\d.\\-\\+\\*\\/\\^]|"+input+"|"+output+"|"+fnName+")+[)])))";
+			String regex = "((([\\d.]+)|"+constantsRegex+"|"+input+"|"+output+")("+constantsRegex+"|"+input+"|"+output+"|("+fnName+"[(]{1}([\\d.\\-\\+\\*\\/\\^]|"+input+"|"+constantsRegex+"|"+output+"|"+fnName+")+[)]{1})))";
 			Pattern pattern = Pattern.compile(regex);
 			Matcher matcher = pattern.matcher(out);
 			
-			Pattern subPattern = Pattern.compile("("+input+"|"+output+"|[(])");
+			Pattern subPattern = Pattern.compile("(("+fnName+"[(])|"+input+"|"+constantsRegex+"|"+output+"|[(])");
 			
 			int count = 0;
 			while (matcher.find()) {
 				String sub = out.substring(matcher.start() + count, matcher.end() + count);
-				System.out.println(sub);
+				//System.out.println(sub);
 				Matcher subMatcher = subPattern.matcher(sub);
 				
 				if (subMatcher.find()) {
-					int index = subMatcher.start();
+					int index;
+					
+					if ((sub.indexOf(fnName) == sub.indexOf(input) + 1) || (sub.indexOf(fnName) == sub.indexOf(output) + 1)) {
+						index = sub.indexOf(fnName);
+					} else {
+						index = subMatcher.start();
+					}
 					String replacement = "(" + sub.substring(0,index) + "*" + sub.substring(index) + ")";
 					out = out.replace(sub, replacement);
 					count += 3;
