@@ -13,6 +13,8 @@ public class IntermediateFunctionStructure {
 	 */
 	public final Function root;
 	
+	private final Namer namer = new Namer("a");
+	
 	/**
 	 * Contains a series of intermediate functions that, when substituted into each other, return the root function. Each function
 	 * is a simple elementary operation containing functions, variables, or real numbers.
@@ -27,13 +29,23 @@ public class IntermediateFunctionStructure {
 	 */
 	public final Map<FunctionPrototype, Optional<Function>> decomposedFunctions = new HashMap<FunctionPrototype, Optional<Function>>();
 	
+	private final List<FunctionPrototype> decomposedFunctionIndex = new ArrayList<FunctionPrototype>();
+	
 	/**
 	 * Contains a list of constants in the root function.
 	 */
-	public final List<String> constants = new ArrayList<String>();
+	public final List<String> rootConstants;
+	
+	/**
+	 * Contains a list of functions in the root function
+	 */
+	public final List<FunctionPrototype> rootFunctions;
 	
 	public IntermediateFunctionStructure(Function rootFunction) {
 		root = rootFunction;
+		rootConstants = rootFunction.assumedConstants();
+		rootFunctions = rootFunction.assumedFunctions();
+		
 		decompose();
 	}
 	
@@ -42,6 +54,34 @@ public class IntermediateFunctionStructure {
 	}
 	
 	private class Namer {
+		private String nextFunctionName = "a";
 		
+		public Namer(String firstName) {
+			nextFunctionName = firstName;
+			
+			if (!validateNextName()) {
+				//generate new name
+			}
+		}
+		
+		private boolean validateNextName() {
+			for (String s : rootConstants) {
+				if (nextFunctionName.equals(s)) {
+					return false;
+				}
+			}
+			
+			for (int i = 0; i < decomposedFunctionIndex.size(); i++) {
+				String fnName = decomposedFunctionIndex.get(i).output();
+				
+				if (nextFunctionName.equals(fnName)) {
+					return false;
+				}
+			}
+			
+			//for (int i = 0; i < ro)
+			
+			return true;
+		}
 	}
 }
