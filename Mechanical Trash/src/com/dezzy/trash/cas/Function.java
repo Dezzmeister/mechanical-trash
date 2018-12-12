@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  *
  * @author Joe Desmond
  */
-public class Function implements FunctionPrototype {
+public class Function extends FunctionPrototype {
 	
 	/**
 	 * Predefined, reserved function names. New functions, constants, and variables cannot have any of these names:
@@ -55,9 +55,6 @@ public class Function implements FunctionPrototype {
 	private String constantsRegex;
 	private String functionsRegex;
 	
-	private final String input;
-	private final String output;
-	
 	/**
 	 * The function definition.
 	 */
@@ -71,9 +68,8 @@ public class Function implements FunctionPrototype {
 	 * @param _output output variable of the function (function name)
 	 * @param _expr function definition
 	 */
-	public Function(String _input, String _output, String _expr) {
-		input = _input;
-		output = _output;
+	public Function(String _output, String _input, String _expr) {
+		super(_output, _input);
 		expr = _expr;
 	}
 	
@@ -85,7 +81,7 @@ public class Function implements FunctionPrototype {
 	 * @param _expr function definition
 	 */
 	public Function(FunctionPrototype proto, String _expr) {
-		this(proto.input(), proto.output(), _expr);
+		this(proto.output(), proto.input(), _expr);
 	}
 	
 	/**
@@ -150,7 +146,9 @@ public class Function implements FunctionPrototype {
 	public String addImplicitOperators(String in) {
 		String out = in;
 		
-		out = addImplicitMultipliers(addFunctionParentheses(removeWhiteSpace(in)));
+		//out = addImplicitMultipliers(addFunctionParentheses(removeWhiteSpace(in)));
+		
+		out = addFunctionParentheses(removeWhiteSpace(in));
 		return out;
 	}
 	
@@ -267,6 +265,22 @@ public class Function implements FunctionPrototype {
 	 */
 	public List<FunctionPrototype> assumedFunctions() {
 		return functions;
+	}
+	
+	public List<String> fullConstantsList() {
+		return fullConstantsList;
+	}
+	
+	public List<String> fullFunctionsList() {
+		return fullFunctionsList;
+	}
+	
+	public String constantsRegex() {
+		return constantsRegex;
+	}
+	
+	public String functionsRegex() {
+		return functionsRegex;
 	}
 
 	@Override

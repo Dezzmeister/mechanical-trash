@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class IntermediateFunctionStructure {
 	
@@ -50,22 +52,78 @@ public class IntermediateFunctionStructure {
 	}
 	
 	public void decompose() {
-		
+		resolveFunctionCalls();
 	}
 	
-	private class Namer {
+	private void resolveFunctionCalls() {
+		String constantsVariablesRegex = "((" + root.input() + ")|(" + root.output() + ")|" + root.constantsRegex().substring(1);
+		
+		String regex = root.functionsRegex() + "[(]?([0-9.]|" + constantsVariablesRegex + ")+[)]?";
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(root.definition());
+		
+		System.out.println(getCompleteFunctionsRegex());
+		
+		while (matcher.find()) {
+			System.out.println(root.definition().substring(matcher.start(), matcher.end()));
+		}
+	}
+	
+	private String getCompleteFunctionsRegex() {
+		String decomposed = "(";
+		
+		for (FunctionPrototype p : decomposedFunctionIndex) {
+			String fnName = p.output();
+			
+			decomposed += "("+fnName+")|";
+		}
+		
+		String rootFunctionsRegex = root.functionsRegex();
+		
+		return decomposed + rootFunctionsRegex.substring(1);
+	}
+	
+	private String getDecomposedFunctionsRegex() {
+		String out = "";
+		
+		for (FunctionPrototype p : decomposedFunctionIndex) {
+			String fnName = p.output();
+			
+			out += "("+fnName+")|";
+		}
+		
+		return (out.isEmpty()) ? "" : "("+out.substring(0,out.length()-1)+")";
+	}
+	
+	private class Namer {		
 		private String nextFunctionName = "a";
 		
 		public Namer(String firstName) {
 			nextFunctionName = firstName;
-			
-			if (!validateNextName()) {
-				//generate new name
+		}
+		
+		public String nextFunctionName() {
+			while (!validateNextName()) {
+				advanceLetterAt(nextFunctionName.length()-1);
 			}
+			
+			return nextFunctionName;
 		}
 		
 		private boolean validateNextName() {
 			for (String s : rootConstants) {
+				if (nextFunctionName.equals(s)) {
+					return false;
+				}
+			}
+			
+			for (String s : Function.PREDEFINED_CONSTANTS) {
+				if (nextFunctionName.equals(s)) {
+					return false;
+				}
+			}
+			
+			for (String s : Function.PREDEFINED_FUNCTIONS) {
 				if (nextFunctionName.equals(s)) {
 					return false;
 				}
@@ -79,9 +137,29 @@ public class IntermediateFunctionStructure {
 				}
 			}
 			
-			//for (int i = 0; i < ro)
+			for (int i = 0; i < rootFunctions.size(); i++) {
+				String fnName = rootFunctions.get(i).output();
+				
+				if (nextFunctionName.equals(fnName)) {
+					return false;
+				}
+			}
 			
 			return true;
+		}
+		
+		private void advanceLetterAt(int position) {
+			if (nextFunctionName.charAt(position) >= 'z') {
+				nextFunctionName = nextFunctionName.substring(0, position) + "a" + nextFunctionName.substring(position + 1);
+				
+				if (position != 0) {
+					advanceLetterAt(--position);
+				} else {
+					nextFunctionName += "a";
+				}
+			} else {
+				nextFunctionName = nextFunctionName.substring(0, position) + (char)(nextFunctionName.charAt(position)+1) + nextFunctionName.substring(position + 1);
+			}
 		}
 	}
 }

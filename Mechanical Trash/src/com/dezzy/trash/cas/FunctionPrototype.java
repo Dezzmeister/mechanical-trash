@@ -5,40 +5,30 @@ package com.dezzy.trash.cas;
  *
  * @author Joe Desmond
  */
-public interface FunctionPrototype {
+public class FunctionPrototype {
+	protected final String input;
+	protected final String output;
+	
+	public FunctionPrototype(String _output, String _input) {
+		input = _input;
+		output = _output;
+	}
 	
 	/**
 	 * Returns the input of this function. There can be only one input.
 	 * 
 	 * @return function input
 	 */
-	public String input();
+	public String input() {
+		return input;
+	}
 	
 	/**
 	 * Returns the output or name of this function. There can be only one output.
 	 * 
 	 * @return function output
 	 */
-	public String output();
-	
-	/**
-	 * Creates an anonymous <code>FunctionPrototype</code> with the specified input and output.
-	 * 
-	 * @param input function input
-	 * @param output function output
-	 * @return a new FunctionPrototype
-	 */
-	public static FunctionPrototype create(String input, String output) {
-		return new FunctionPrototype() {
-			@Override
-			public String input() {
-				return input;
-			}
-			
-			@Override
-			public String output() {
-				return output;
-			}
-		};
+	public String output() {
+		return output;
 	}
 }

@@ -1,6 +1,7 @@
 package com.dezzy.trash;
 
 import com.dezzy.trash.cas.Function;
+import com.dezzy.trash.cas.IntermediateFunctionStructure;
 
 public class Main {
 	
@@ -9,5 +10,7 @@ public class Main {
 		Function test1 = new Function("x","y","3x + 4sin45 - ysiny + sin(lnx)").prepare();
 		
 		System.out.println(test1.definition());
+		
+		IntermediateFunctionStructure structure = new IntermediateFunctionStructure(test1);
 	}
 }
