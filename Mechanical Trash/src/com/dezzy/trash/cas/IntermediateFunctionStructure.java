@@ -62,7 +62,7 @@ public class IntermediateFunctionStructure {
 		Pattern pattern = Pattern.compile(regex);
 		Matcher matcher = pattern.matcher(root.definition());
 		
-		System.out.println(getCompleteFunctionsRegex());
+		//System.out.println(getCompleteFunctionsRegex());
 		
 		while (matcher.find()) {
 			System.out.println(root.definition().substring(matcher.start(), matcher.end()));
